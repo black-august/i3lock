@@ -23,7 +23,7 @@
 #include "randr.h"
 #include "dpi.h"
 
-#define BUTTON_RADIUS 90
+#define BUTTON_RADIUS 140 
 #define BUTTON_SPACE (BUTTON_RADIUS + 5)
 #define BUTTON_CENTER (BUTTON_RADIUS + 5)
 #define BUTTON_DIAMETER (2 * BUTTON_SPACE)
@@ -188,19 +188,22 @@ void draw_image(xcb_pixmap_t bg_pixmap, uint32_t *resolution) {
                   2 * M_PI /* end */);
 
         /* Use the appropriate color for the different PAM states
-         * (currently verifying, wrong password, or default) */
+         * (currently verifying, wrong password, or default) 
+         * Sets the inside of the circle , for auth_state */
         switch (auth_state) {
             case STATE_AUTH_VERIFY:
             case STATE_AUTH_LOCK:
-                cairo_set_source_rgba(ctx, 0, 114.0 / 255, 255.0 / 255, 0.75);
+                // Blue
+                cairo_set_source_rgba(ctx, 17.0 / 255, 25.0 / 255, 75.0 / 255, 0.75);
                 break;
             case STATE_AUTH_WRONG:
             case STATE_I3LOCK_LOCK_FAILED:
-                cairo_set_source_rgba(ctx, 250.0 / 255, 0, 0, 0.75);
+                // Red
+                cairo_set_source_rgba(ctx, 128.0 / 255, 14.0 / 255, 19.0 / 255, 0.75);
                 break;
             default:
                 if (unlock_state == STATE_NOTHING_TO_DELETE) {
-                    cairo_set_source_rgba(ctx, 250.0 / 255, 0, 0, 0.75);
+                    cairo_set_source_rgba(ctx, 128.0 / 255, 14.0 / 255, 19.0 / 255, 0.75);
                     break;
                 }
                 cairo_set_source_rgba(ctx, 0, 0, 0, 0.75);
@@ -208,22 +211,23 @@ void draw_image(xcb_pixmap_t bg_pixmap, uint32_t *resolution) {
         }
         cairo_fill_preserve(ctx);
 
+        /* Outer circle for auth state */
         switch (auth_state) {
             case STATE_AUTH_VERIFY:
             case STATE_AUTH_LOCK:
-                cairo_set_source_rgb(ctx, 51.0 / 255, 0, 250.0 / 255);
+                cairo_set_source_rgb(ctx, 35.0 / 255, 57.0 / 255 , 91.0 / 255);
                 break;
             case STATE_AUTH_WRONG:
             case STATE_I3LOCK_LOCK_FAILED:
-                cairo_set_source_rgb(ctx, 125.0 / 255, 51.0 / 255, 0);
+                cairo_set_source_rgb(ctx, 175.0 / 255, 40.0 / 255, 49.0 / 255);
                 break;
             case STATE_AUTH_IDLE:
                 if (unlock_state == STATE_NOTHING_TO_DELETE) {
-                    cairo_set_source_rgb(ctx, 125.0 / 255, 51.0 / 255, 0);
+                    cairo_set_source_rgb(ctx, 0, 0, 0);
                     break;
                 }
-
-                cairo_set_source_rgb(ctx, 51.0 / 255, 125.0 / 255, 0);
+                // Default outter rim
+                cairo_set_source_rgb(ctx, 0, 0, 0);
                 break;
         }
         cairo_stroke(ctx);
@@ -247,17 +251,17 @@ void draw_image(xcb_pixmap_t bg_pixmap, uint32_t *resolution) {
         char buf[4];
 
         cairo_set_source_rgb(ctx, 0, 0, 0);
-        cairo_select_font_face(ctx, "sans-serif", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+        cairo_select_font_face(ctx, "monospace", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
         cairo_set_font_size(ctx, 28.0);
         switch (auth_state) {
             case STATE_AUTH_VERIFY:
-                text = "Verifying…";
+                text = "Unlocking...";
                 break;
             case STATE_AUTH_LOCK:
                 text = "Locking…";
                 break;
             case STATE_AUTH_WRONG:
-                text = "Wrong!";
+                text = "Fuck off.";
                 break;
             case STATE_I3LOCK_LOCK_FAILED:
                 text = "Lock failed!";
@@ -321,8 +325,8 @@ void draw_image(xcb_pixmap_t bg_pixmap, uint32_t *resolution) {
                       highlight_start,
                       highlight_start + (M_PI / 3.0));
             if (unlock_state == STATE_KEY_ACTIVE) {
-                /* For normal keys, we use a lighter green. */
-                cairo_set_source_rgb(ctx, 51.0 / 255, 219.0 / 255, 0);
+                /* For normal keys, we use a lighter silver. */
+                cairo_set_source_rgb(ctx, 216, 232, 232);
             } else {
                 /* For backspace, we use red. */
                 cairo_set_source_rgb(ctx, 219.0 / 255, 51.0 / 255, 0);
